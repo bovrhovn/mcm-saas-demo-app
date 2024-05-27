@@ -108,28 +108,35 @@ if ($UseEnvFile)
 $groupNameExport = New-AzSubscriptionDeployment -Location $Location -TemplateFile "..\Bicep\rg.bicep" -TemplateParameterFile "..\Bicep\rg.parameters.json" -Verbose
 
 Write-Verbose "Resource group created $groupNameExport"
-$groupName = $groupNameExport.Outputs.rgName.Value
-Write-Information "The resource group name is $groupName"
+$groupName = $groupNameExport.Outputs.rgName.value
+Write-Output "The resource group name is $groupName"
 
 # deploy web app with application insights
 $sqlDetails = New-AzResourceGroupDeployment -ResourceGroupName $groupName -TemplateFile "..\Bicep\sql.bicep" -TemplateParameterFile "..\Bicep\sql.parameters.json" -Verbose
-Write-Information "SQL deployed to $Location with details $sqlDetails
-$sqlConnString = $sqlDetails.Outputs.sqlConn.Value
-Write-Information "SQL connection string is $sqlConnString"
-Write-Verbose "Updating connection string setting for web app."
+Write-Output "SQL deployed to $Location with details $sqlDetails"
+$appSettings = Get-Content -Path "..\Bicep\sql.parameters.json" | ConvertFrom-Json
+$serverName=$appSettings.parameters.serverName.value
+$sqlDBName=$appSettings.parameters.sqlDBName.value
+$administratorLogin=$appSettings.parameters.administratorLogin.value
+$administratorLoginPassword=$appSettings.parameters.administratorLoginPassword.value
+Write-Information "Reading data from sql.parameters.json $sqlDBName and $serverName and $administratorLogin and $administratorLoginPassword."
+$sqlConnString = "Server=tcp:$serverName.database.windows.net,1433;Initial Catalog=$sqlDBName;Persist Security Info=False;User ID=$administratorLogin@mcm-data-server.database.windows.net;Password=$administratorLoginPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 
 $appSettings = Get-Content -Path "..\Bicep\webapp.parameters.json" | ConvertFrom-Json
 Write-Verbose "Getting app settings from webapp.parameters.json $appSettings"
-$appSettings.parameters.sqlConn=$sqlConnString
-Write-Verbose "Updating app settings with connection string $appSettings"
+Write-Output "SQL connection string to set is $sqlConnString"
+Write-Verbose "Updating connection string setting for web app."
+$appSettings.parameters.sqlConn.value=$sqlConnString
+Write-Verbose "Updating app settings with connection string $sqlConnString"
 Set-Content -Path "..\Bicep\webapp.parameters.json" -Value ($appSettings | ConvertTo-Json)
-
-Write-Information "Connection string updated for web app. Deploying web app."
+Write-Output "Connection string updated for web app. Deploying web app."
 
 $urlDetails = New-AzResourceGroupDeployment -ResourceGroupName $groupName -TemplateFile "..\Bicep\webapp.bicep" -TemplateParameterFile "..\Bicep\webapp.parameters.json" -Verbose
-$urlToOpen = $sqlDetails.urlDetails.pageUrl.Value
-Write-Information "Web App deployed to $Location with $urlToOpen"
-
+$urlToOpen = $sqlDetails.Outputs.pageUrl.value
+if (-not [string]::IsNullOrEmpty($urlToOpen))
+{
+    Write-Output "Web App deployed to $Location with $urlToOpen"
+}
 Stop-Transcript
 
 if ($OpenBrowserWithLatestUrl)

@@ -1,7 +1,7 @@
-﻿{
+{
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {    
+  "parameters": {
     "skuName": {
       "value": "B1"
     },
@@ -11,8 +11,8 @@
     "webSiteName": {
       "value": "wapp-mcm-azuredemos-web-app"
     },
-    "sqlConn":{
-      "value": "Server=tcp:sqlserver.database.windows.net,1433;Initial Catalog=MCMDB;Persist Security Info=False;User ID=user;Password=Password123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    "sqlConn": {
+      "value": "ConnectionString"
     }
   }
 }

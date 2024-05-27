@@ -15,7 +15,7 @@ var appServicePlanName = toLower('asp-${appName}')
 param webSiteName string = toLower('wapp-${appName}')
 
 @description('Web application name to be deployed to')
-param sqlConn string = 'Server=tcp:myserver.database.windows.net,1433;Database=mydatabase;User ID=myuser;Password=mypassword;Trusted_Connection=False;Encrypt=True;'
+param sqlConn string = 'ConnectionString'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: appServicePlanName
@@ -32,10 +32,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
 
 resource appService 'Microsoft.Web/sites@2020-06-01' = {
   name: webSiteName
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
+  location: location  
   tags: {
     displayName: 'Website'
     ProjectName: appName
@@ -44,12 +41,13 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      minTlsVersion: '1.2'
+      netFrameworkVersion:'v8.0'
+      minTlsVersion: '1.2'      
     }
   }
 }
 
-resource environmentSettings 'Microsoft.Web/sites/config@2023-05-01-preview' = {
+resource environmentSettings 'Microsoft.Web/sites/config@2023-12-01' = {
     parent: appService
     name: 'appsettings'
     properties: {        
@@ -81,5 +79,5 @@ resource applicationLogsSettings 'Microsoft.Web/sites/config@2020-06-01' = {
   }
 }
 
-@description('Output sql connection string')
-output pageUrl string = appService.properties.defaultHostName
+@description('Output url of the website')
+output pageUrl string = 'https://${webSiteName}.azurewebsites.net'
