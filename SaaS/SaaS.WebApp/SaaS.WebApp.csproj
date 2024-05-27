@@ -12,5 +12,9 @@
         <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Data\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
 
 </Project>
