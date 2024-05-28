@@ -18,7 +18,7 @@ public class WebAppUserRepository(IOptions<SqlOptions> sqlOptionsValue)
             await connection.OpenAsync();
         
         var currentUser = await connection.QuerySingleOrDefaultAsync<WebAppUser>(
-            "SELECT U.McUserId FROM McUsers U WHERE U.Email=@username", new { username });
+            "SELECT U.McUserId as WebAppUserId, U.Password FROM McUsers U WHERE U.Email=@username", new { username });
 
         if (currentUser == null) throw new KeyNotFoundException($"User with {username} has not been found!");
 
@@ -42,7 +42,7 @@ public class WebAppUserRepository(IOptions<SqlOptions> sqlOptionsValue)
         await using var connection = new SqlConnection(sqlOptions.ConnectionString);
         if (connection.State == ConnectionState.Closed)
             await connection.OpenAsync();
-        var query = "SELECT U.McUserId,U.Fullname,U.Email,U.IsAdmin FROM McUsers U WHERE U.McUserId=@userId;" + 
+        var query = "SELECT U.McUserId as WebAppUserId,U.Fullname,U.Email,U.IsAdmin FROM McUsers U WHERE U.McUserId=@userId;" + 
                     "SELECT P.PaymentId,P.Location,P.Currency,P.IsApproved,P.CreatedAt FROM Payments P WHERE P.McUserId=@userId;";
         var result = await connection.QueryMultipleAsync(query, new { userId });
         var currentUser = await result.ReadSingleAsync<WebAppUser>();

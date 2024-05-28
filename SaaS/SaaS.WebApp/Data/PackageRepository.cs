@@ -16,17 +16,21 @@ public class PackageRepository(IOptions<SqlOptions> sqlOptionsValue)
         await using var connection = new SqlConnection(sqlOptions.ConnectionString);
         if (connection.State == ConnectionState.Closed)
             await connection.OpenAsync();
-        var query = "SELECT P.PackageId,P.Name,P.Price,P.Description FROM Packages P;";
+        var query = "SELECT P.PackageId,P.Name,P.Price,P.Description," +
+                    "PaymentConfigurationCount=" +
+                    "(SELECT count(PP.PaymentId) FROM Package2Payments PP WHERE PP.PackageId=P.PackageId) " +
+                    "FROM Packages P";
         var packages = await connection.QueryAsync<Package>(query);
         return packages.ToList();
     }
-    
+
     public async Task<Package> AddPackageAsync(Package package)
     {
         await using var connection = new SqlConnection(sqlOptions.ConnectionString);
         if (connection.State == ConnectionState.Closed)
             await connection.OpenAsync();
-        var query = "INSERT INTO Packages (Name,Price,Description) VALUES (@name, @price, @desc); SELECT CAST(SCOPE_IDENTITY() as int)";
+        var query =
+            "INSERT INTO Packages (Name,Price,Description) VALUES (@name, @price, @desc); SELECT CAST(SCOPE_IDENTITY() as int)";
         var packageId = await connection.QuerySingleAsync<int>(query, new
         {
             name = package.Name,
@@ -35,5 +39,21 @@ public class PackageRepository(IOptions<SqlOptions> sqlOptionsValue)
         });
         package.PackageId = packageId;
         return package;
+    }
+
+    public async Task<List<Package>> SearchAsync(string query)
+    {
+        if (string.IsNullOrEmpty(query)) return await GetPackagesAsync();
+
+        await using var connection = new SqlConnection(sqlOptions.ConnectionString);
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        var currentQuery = "SELECT P.PackageId,P.Name,P.Price,P.Description," +
+                           "PaymentConfigurationCount=" +
+                           "(SELECT count(PP.PaymentId) FROM Package2Payments PP WHERE PP.PackageId=P.PackageId)  " +
+                           "FROM Packages P WHERE P.Name LIKE '%" +
+                           query + "%';";
+        var packages = await connection.QueryAsync<Package>(currentQuery);
+        return packages.ToList();
     }
 }

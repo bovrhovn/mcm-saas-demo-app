@@ -24,6 +24,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddSingleton<UserDataContext>();
 builder.Services.AddSingleton<WebAppUserRepository>();
+builder.Services.AddSingleton<PackageRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
