@@ -1,8 +1,11 @@
 using System.Net;
 using System.Text.Json.Serialization;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using SaaS.WebApp.Data;
 using SaaS.WebApp.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,13 +15,18 @@ builder.Services.AddOptions<SqlOptions>()
     .Bind(builder.Configuration.GetSection("SqlOptions"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddRazorPages()
-    .AddRazorPagesOptions(options =>
-        options.Conventions.AddPageRoute("/Info/Index", ""));
-
+builder.Services.AddOptions<EntraOptions>()
+    .Bind(builder.Configuration.GetSection("SaaSOptions"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+builder.Services.AddRazorPages().AddRazorPagesOptions(options => options.Conventions.AddPageRoute("/Info/Index", ""));
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-
+builder.Services.AddSingleton<UserDataContext>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.LoginPath = new PathString("/User/Login"));
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Info/Error");

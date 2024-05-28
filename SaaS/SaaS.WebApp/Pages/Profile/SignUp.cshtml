@@ -1,0 +1,46 @@
+﻿@page "{token?}"
+@model SaaS.WebApp.Pages.Profile.SignUpPageModel
+
+@{
+    ViewData["Title"] = "Sign Up Form";
+}
+<h3 class="text-muted">Signup to SaaS Demo App</h3>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+<div class="alert alert-danger" role="alert">
+    <i class="fa-solid fa-exclamation-triangle"></i> @Model.Message
+</div>
+}
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="SignupModel.Username" class="form-label">Email address</label>
+        <input type="email" class="form-control" asp-for="SignupModel.Username" placeholder="name@example.com">
+    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label asp-for="SignupModel.Password" class="col-form-label">Password</label>
+        </div>
+        <div class="col-auto">
+            <input type="password" asp-for="SignupModel.Password" class="form-control" aria-describedby="passwordHelpInline">
+        </div>
+        <div class="col-auto">
+            <span id="passwordHelpInline" class="form-text">
+                Must be between 5 and 20 characters long.
+            </span>
+        </div>
+    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label asp-for="SignupModel.RepeatPassword" class="col-form-label">Password</label>
+        </div>
+        <div class="col-auto">
+            <input type="password" asp-for="SignupModel.RepeatPassword" class="form-control" aria-describedby="passwordHelpInline">
+        </div>
+        <div class="col-auto">
+            <span id="passwordHelpInline" class="form-text">
+                Passwords must be the same
+            </span>
+        </div>
+    </div>
+    <button type="submit">Sign me up <i class="fa-solid fa-person"></i></button>
+</form>

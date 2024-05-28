@@ -1,0 +1,69 @@
+﻿@page
+@model SaaS.WebApp.Pages.Profile.LoginPageModel
+
+@{
+    ViewData["Title"] = "Login Form";
+}
+
+<h3 class="text-muted">Login to SaaS Demo App</h3>
+<p class="text-info">Enter username and password for login to auth area. If you don't have an account, create new one below.</p>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-exclamation-triangle"></i> @Model.Message
+    </div>
+}
+<div class="row">
+    <div class="col">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="LoginModel.Username" class="form-label">Email address</label>
+                <input type="email" class="form-control" asp-for="LoginModel.Username" placeholder="name@example.com">
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label asp-for="LoginModel.Password" class="col-form-label">Password</label>
+                </div>
+                <div class="col-auto">
+                    <input type="password" asp-for="LoginModel.Password" class="form-control" aria-describedby="passwordHelpInline">
+                </div>
+                <div class="col-auto">
+                    <span id="passwordHelpInline" class="form-text">
+                        Must be between 5 and 20 characters long.
+                    </span>
+                </div>
+            </div>
+            <button type="submit">Login me <i class="fa-solid fa-key"></i></button>
+        </form>
+    </div>
+    <div class="col-3">
+        <div class="card text-bg-light mb-3">
+            <div class="card-header">Additional information</div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>
+                        <a class="card-link"
+                           asp-page="/Profile/SignUp"
+                           target="_blank">
+                            Create new account
+                        </a>
+                    </li>
+                    <li>
+                        <a class="card-link"
+                           href="https://microsoft.github.io/Mastering-the-Marketplace"
+                           target="_blank">
+                            Master the marketplace
+                        </a>
+                    </li>
+                    <li>
+                        <a class="card-link"
+                           href="https://github.com/microsoft/commercial-marketplace-client-dotnet"
+                           target="_blank">
+                            .NET SaaS library
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

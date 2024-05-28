@@ -1,0 +1,16 @@
+﻿@page
+@using SaaS.WebApp.Data
+@model SaaS.WebApp.Pages.Profile.LogoutPageModel
+@inject UserDataContext UserDataContextValue
+
+@{
+    var fullName = UserDataContextValue.GetCurrentUser().Fullname;
+    ViewData["Title"] = "Logout " + fullName;
+}
+
+<h3 class="text-muted">Logout from SaaS Demo App for user @fullName</h3>
+<p class="text-info">By pressing on <b>Logout</b> button you won't have access to authorised section of the page.</p>
+
+<form method="post">
+    <button type="submit">Logout @fullName <i class="fa-solid fa-sign-out"></i></button>
+</form>

@@ -1,0 +1,26 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AB112FA01DD691499A8C0858DB20EAD8/Text/@EntryValue">@page
+@model $NAMESPACE$.$CLASS$
+
+@{
+    ViewData["Title"] = "$title$";    
+}
+
+$END$
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AB112FA01DD691499A8C0858DB20EAD8/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AB112FA01DD691499A8C0858DB20EAD8/Field/=title/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AB112FA01DD691499A8C0858DB20EAD8/Field/=title/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=AB112FA01DD691499A8C0858DB20EAD8/Field/=title/Order/@EntryValue">3</s:Int64>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BF56153668D6434BAEBFC640173EDE9C/Text/@EntryValue">@page
+@model $NAMESPACE$.$CLASS$
+
+@{
+    ViewData["Title"] = "$title$";
+}
+
+$END$</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BF56153668D6434BAEBFC640173EDE9C/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BF56153668D6434BAEBFC640173EDE9C/Field/=title/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BF56153668D6434BAEBFC640173EDE9C/Field/=title/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BF56153668D6434BAEBFC640173EDE9C/Field/=title/Order/@EntryValue">3</s:Int64></wpf:ResourceDictionary>
