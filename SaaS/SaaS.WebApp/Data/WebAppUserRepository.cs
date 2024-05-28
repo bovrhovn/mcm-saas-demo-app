@@ -18,13 +18,37 @@ public class WebAppUserRepository(IOptions<SqlOptions> sqlOptionsValue)
             await connection.OpenAsync();
         
         var currentUser = await connection.QuerySingleOrDefaultAsync<WebAppUser>(
-            "SELECT U.McUserId, U.Password, U.Email, U.IsAdmin, U.Fullname FROM McUsers U WHERE U.Email=@username", new { username });
+            "SELECT U.McUserId FROM McUsers U WHERE U.Email=@username", new { username });
 
         if (currentUser == null) throw new KeyNotFoundException($"User with {username} has not been found!");
 
         if (!PasswordHash.ValidateHash(password, currentUser.Password))
             throw new Exception("Entered password is not a match");
 
+        currentUser = await GetDetailsForUserAsync(currentUser.WebAppUserId);
+        return currentUser;
+    }
+    
+    public async Task<List<WebAppUser>> GetUsersAsync(string search="")
+    {
+        await using var connection = new SqlConnection(sqlOptions.ConnectionString);
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        throw new NotImplementedException();
+    }
+
+    public async Task<WebAppUser> GetDetailsForUserAsync(int userId)
+    {
+        await using var connection = new SqlConnection(sqlOptions.ConnectionString);
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        var query = "SELECT U.McUserId,U.Fullname,U.Email,U.IsAdmin FROM McUsers U WHERE U.McUserId=@userId;" + 
+                    "SELECT P.PaymentId,P.Location,P.Currency,P.IsApproved,P.CreatedAt FROM Payments P WHERE P.McUserId=@userId;";
+        var result = await connection.QueryMultipleAsync(query, new { userId });
+        var currentUser = await result.ReadSingleAsync<WebAppUser>();
+        var payments = await result.ReadAsync<Payment>();
+        var currentUserPayments = payments.ToList();
+        currentUser.Payments = currentUserPayments;
         return currentUser;
     }
 
