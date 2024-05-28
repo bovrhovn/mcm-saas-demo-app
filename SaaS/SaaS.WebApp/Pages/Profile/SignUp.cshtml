@@ -13,34 +13,20 @@
 }
 <form method="post">
     <div class="mb-3">
+        <label asp-for="SignupModel.FullName" class="form-label">Full name</label>
+        <input type="text" class="form-control" asp-for="SignupModel.FullName" placeholder="Yianni Whackamole">
+    </div>
+    <div class="mb-3">
         <label asp-for="SignupModel.Username" class="form-label">Email address</label>
         <input type="email" class="form-control" asp-for="SignupModel.Username" placeholder="name@example.com">
     </div>
-    <div class="row g-3 align-items-center">
-        <div class="col-auto">
-            <label asp-for="SignupModel.Password" class="col-form-label">Password</label>
-        </div>
-        <div class="col-auto">
-            <input type="password" asp-for="SignupModel.Password" class="form-control" aria-describedby="passwordHelpInline">
-        </div>
-        <div class="col-auto">
-            <span id="passwordHelpInline" class="form-text">
-                Must be between 5 and 20 characters long.
-            </span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="SignupModel.Password" class="form-label">Password</label>
+        <input type="password" class="form-control" asp-for="SignupModel.Password">
     </div>
-    <div class="row g-3 align-items-center">
-        <div class="col-auto">
-            <label asp-for="SignupModel.RepeatPassword" class="col-form-label">Password</label>
-        </div>
-        <div class="col-auto">
-            <input type="password" asp-for="SignupModel.RepeatPassword" class="form-control" aria-describedby="passwordHelpInline">
-        </div>
-        <div class="col-auto">
-            <span id="passwordHelpInline" class="form-text">
-                Passwords must be the same
-            </span>
-        </div>
+    <div class="mb-3">
+        <label asp-for="SignupModel.RepeatPassword" class="form-label">Repeat password</label>
+        <input type="password" class="form-control" asp-for="SignupModel.RepeatPassword">
     </div>
-    <button type="submit">Sign me up <i class="fa-solid fa-person"></i></button>
+    <button type="submit" class="btn btn-primary">Sign me up <i class="fa-solid fa-person"></i></button>
 </form>
