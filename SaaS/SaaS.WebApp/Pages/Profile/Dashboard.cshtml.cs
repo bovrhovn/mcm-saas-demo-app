@@ -35,6 +35,4 @@ public class DashboardPageModel(
             package.PackageId, result);
         return new JsonResult(result);
     }
-
-    
 }
