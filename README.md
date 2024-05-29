@@ -61,6 +61,9 @@ It contains:
 4. **Webhook** for the publisher perspective with minimum required api's to respond to communication from Microsoft
    Marketplace. More [here](https://learn.microsoft.com/en-us/partner-center/marketplace/partner-center-portal/pc-saas-fulfillment-webhook).
 5. **Bicep Templates**: Bicep templates to deploy the web application to Azure. Available [here](./Bicep).
+6. It uses simple SQL for data storage purposes. The database is hosted on Azure SQL Database.
+
+<img alt="database structure" height="500" src="https://webeudatastorage.blob.core.windows.net/web/database-structure-mcm.png" width="300"/>
 
 # Additional information
 
