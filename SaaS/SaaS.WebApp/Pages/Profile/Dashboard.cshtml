@@ -1,6 +1,8 @@
 ﻿@page
+@using SaaS.WebApp.Core
+@using SaaS.WebApp.Data
 @model SaaS.WebApp.Pages.Profile.DashboardPageModel
-
+@inject UserDataContext userViewModel
 @{
     ViewData["Title"] = "Administration dashboard";
 }
@@ -16,22 +18,24 @@
                       variant="solo">
         </v-text-field>
     </div>
-    <div class="row row-cols-1 row-cols-md-2 g-4" v-if="searchResults.length">
-        <div class="col" v-for="currentSearchTerm in searchResults" :key="currentSearchTerm.webAppUserId">
+    <div class="row" v-if="searchResults.length">
+        <div v-for="currentSearchTerm in searchResults" :key="currentSearchTerm.webAppUserId">
             <h4 class="text-muted">{{ currentSearchTerm.fullName }}</h4>
             <table class="table table-hover" v-if="currentSearchTerm.packages.length">
-                <tr>
-                    <td>Name</td>
-                    <td>Description</td>
-                    <td>Price</td>
-                    <td>Actions</td>
-                </tr>
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tr v-for="currentPackage in currentSearchTerm.packages" :key="currentPackage.packageId">
                 <td>{{ currentPackage.name }}</td>
                 <td>{{ currentPackage.description }}</td>
                 <td>{{ currentPackage.price }}</td>
-                <td>
-                    <v-btn icon="fas fa-edit" density="compact" v-on:click="unsubscribe(currentPackage.packageId)"></v-btn>
+                <td class="text-center">
+                    <v-btn icon="fa-solid fa-xmark" density="compact" v-on:click="unsubscribe(currentPackage.packageId)"></v-btn>
                 </td>
             </table>
             <p class="text-info" v-else>
@@ -82,35 +86,37 @@
       function unsubscribe(packageId) {
           console.log('Unsubscribing for the current user the package with id ' + packageId);
           isLoading.value = true;
-          message.value = "Unsubscribing...";
-          let unsubscribeUrl = '@Url.Page("Dashboard", "Unsubscribe")';
+          message.value = "Unsubscribing...";          
+          let unsubscribeUrl = '/@RouteHelper.RoutePackages' + '/@RouteHelper.UnsubscribeRoute';
+          console.log(unsubscribeUrl);
+          let userId = @userViewModel.GetCurrentUser().UserId;
           let currentPackage = {
-              PackageId: packageId              
+              PackageId: packageId,
+              UserId: userId
           };
-
+          console.log(currentPackage);
           fetch(unsubscribeUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    packageId: currentPackage
-                })
-            }).then(response => {
+              method: 'POST',
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(currentPackage)
+          }).then(response => {
               if (!response.ok) {
                   console.log("There has been an error while fetching data from the server.");
                   return Promise.reject(response);
               }
-              message.value = "Unsubscribed successfully.";
           });
           isLoading.value = false;
-          callSearchAPI();
+          window.location.reload();
       }
       
       function callSearchAPI() {
          let searchTerm = query.value;
           console.log('searching with ' + searchTerm);        
-          isLoading.value = true;    
+          isLoading.value = true;
+          searchResults.value = [];   
           message.value = "Retrieving data from the server...";      
           let searchUrl = '@Url.Page("Dashboard", "Search")' + "&query=" + searchTerm;
           console.log("Search url is " + searchUrl);

@@ -66,7 +66,7 @@ public class WebAppUserRepository(IOptions<SqlOptions> sqlOptionsValue)
             await connection.OpenAsync();
         var query =
             "SELECT U.McUserId as WebAppUserId,U.Fullname,U.Email,U.IsAdmin FROM McUsers U WHERE U.McUserId=@userId;" +
-            "SELECT P.PackageId,P.Name,P.Description,P.Price FROM Payments P " +
+            "SELECT P.PackageId,P.Name,P.Description,P.Price FROM Packages P " +
             "JOIN McUser2Packages PP on PP.PackageId=P.PackageId " +
             "WHERE PP.McUserId=@userId;";
         var result = await connection.QueryMultipleAsync(query, new { userId });

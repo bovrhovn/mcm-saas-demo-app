@@ -2,9 +2,11 @@ using System.Net;
 using System.Text.Json.Serialization;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using SaaS.WebApp.Core;
 using SaaS.WebApp.Data;
 using SaaS.WebApp.Options;
 
@@ -29,12 +31,21 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = new PathString("/User/Login"));
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(new CorsPolicyBuilder()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowAnyOrigin()
+        .Build());
+});
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Info/Error");
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors();
 app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
@@ -52,7 +63,7 @@ app.UseExceptionHandler(options =>
         }
     });
 });
-app.MapHealthChecks("/health", new HealthCheckOptions
+app.MapHealthChecks($"/{RouteHelper.HealthRoute}", new HealthCheckOptions
 {
     Predicate = _ => true,
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

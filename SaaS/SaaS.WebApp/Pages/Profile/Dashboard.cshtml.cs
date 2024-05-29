@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SaaS.WebApp.Data;
-using SaaS.WebApp.Models;
 
 namespace SaaS.WebApp.Pages.Profile;
 
@@ -25,14 +24,5 @@ public class DashboardPageModel(
         var list = await webAppUserRepository.GetUsersAsync(query);
         logger.LogInformation("Search for {Search} completed. {UserCount} packages found", query, list.Count);
         return new JsonResult(list);
-    }
-
-    public async Task<IActionResult> OnPostUnsubscribeAsync(Package package)
-    {
-        var user = userDataContext.GetCurrentUser();
-        var result = await packageRepository.UnSubscribeFromPackageAsync(package.PackageId, user.UserId);
-        logger.LogInformation("User {UserId} unsubscribed from package {PackageId}. Result: {Result}", user.UserId,
-            package.PackageId, result);
-        return new JsonResult(result);
     }
 }

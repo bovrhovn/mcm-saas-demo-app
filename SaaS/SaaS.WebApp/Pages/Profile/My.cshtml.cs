@@ -37,7 +37,7 @@ public class MyPageModel(
             return Page();
         }
 
-        return RedirectToPage("/Profile/MyPackages");
+        return RedirectToPage("/Profile/My");
     }
 
     [BindProperty] public WebAppUser CurrentUser { get; set; }

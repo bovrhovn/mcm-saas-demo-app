@@ -13,14 +13,16 @@
 @if (@Model.CurrentUser.Packages.Any())
 {
     <table class="table table-hover">
-        <tr>
-            <td>
-                Package name
-            </td>
-            <td>Description</td>
-            <td>Price</td>
-            <td>...</td>
-        </tr>
+        <thead class="table-dark">
+            <tr>
+                <td>
+                    Package name
+                </td>
+                <td>Description</td>
+                <td>Price</td>
+                <td>...</td>
+            </tr>
+        </thead>
         @foreach (var modelPackage in Model.CurrentUser.Packages)
         {
             <tr>
@@ -31,7 +33,7 @@
                 <td>@modelPackage.Price</td>
                 <td>
                     <form method="post">
-                        <input type="hidden" name="packageId" value="@modelPackage.PackageId" />
+                        <input type="hidden" name="packageId" value="@modelPackage.PackageId"/>
                         <button class="btn btn-danger">Unsubscribe</button>
                     </form>
                 </td>
@@ -42,6 +44,6 @@
 else
 {
     <p class="text-info">
-        No packages have been retrieved. Want to subscribe to a package? <a asp-page="/Packages/Info">Click here</a>
+        No packages have been retrieved. Want to subscribe to a package? <a asp-page="/Packages/Index">Click here</a>
     </p>
 }
