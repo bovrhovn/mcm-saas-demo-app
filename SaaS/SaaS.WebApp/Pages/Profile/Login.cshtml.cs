@@ -34,7 +34,7 @@ public class LoginPageModel(ILogger<LoginPageModel> logger, WebAppUserRepository
             return Page();
         }
 
-        return Redirect("/");
+        return RedirectToPage("/Profile/My");
     }
 
     [BindProperty] public LoginViewModel LoginModel { get; set; } = new();

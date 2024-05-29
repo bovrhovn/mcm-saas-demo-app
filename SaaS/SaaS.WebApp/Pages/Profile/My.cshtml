@@ -1,0 +1,47 @@
+﻿@page
+@model SaaS.WebApp.Pages.Profile.MyPageModel
+
+@{
+    var fullName = Model.CurrentUser.FullName;
+    ViewData["Title"] = fullName;
+}
+
+<h3 class="text-muted">@fullName</h3>
+<p>Email: @Model.CurrentUser.Email</p>
+<h3 class="text-muted">My @Model.CurrentUser.Packages.Count packages</h3>
+
+@if (@Model.CurrentUser.Packages.Any())
+{
+    <table class="table table-hover">
+        <tr>
+            <td>
+                Package name
+            </td>
+            <td>Description</td>
+            <td>Price</td>
+            <td>...</td>
+        </tr>
+        @foreach (var modelPackage in Model.CurrentUser.Packages)
+        {
+            <tr>
+                <td>
+                    @modelPackage.Name
+                </td>
+                <td>@modelPackage.Description</td>
+                <td>@modelPackage.Price</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="packageId" value="@modelPackage.PackageId" />
+                        <button class="btn btn-danger">Unsubscribe</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>    
+}
+else
+{
+    <p class="text-info">
+        No packages have been retrieved. Want to subscribe to a package? <a asp-page="/Packages/Info">Click here</a>
+    </p>
+}

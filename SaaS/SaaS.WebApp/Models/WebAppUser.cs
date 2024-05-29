@@ -7,5 +7,5 @@ public class WebAppUser
     public string Email { get; set; }
     public string Password { get; set; }
     public bool IsAdmin { get; set; }
-    public List<Payment> Payments { get; set; } = new();
+    public List<Package> Packages { get; set; } = new();
 }

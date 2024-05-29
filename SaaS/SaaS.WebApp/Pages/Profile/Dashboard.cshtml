@@ -7,8 +7,119 @@
 
 <h3 class="text-muted">Dashboard</h3>
 
-<div class="row row-cols-1 row-cols-md-2 g-4">
-    <div class="col">
-        
+<div id="app">
+    <div class="form-floating mb-3">
+        <v-text-field clearable label="Enter search term to search users"
+                      v-model="query"
+                      v-on:keyup.enter="callSearchAPI"
+                      variant="solo">
+        </v-text-field>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-4" v-if="searchResults.length">
+        <div class="col" v-for="currentSearchTerm in searchResults" :key="currentSearchTerm.webAppUserId">
+            <h4 class="text-muted">{{ currentSearchTerm.fullName }}</h4>
+            <table class="table table-hover" v-if="currentSearchTerm.packages.length">
+                <tr>
+                    <td>Name</td>
+                    <td>Description</td>
+                    <td>Price</td>
+                    <td>Actions</td>
+                </tr>
+                <tr v-for="currentPackage in currentSearchTerm.packages" :key="currentPackage.packageId">
+                <td>{{ currentPackage.name }}</td>
+                <td>{{ currentPackage.description }}</td>
+                <td>{{ currentPackage.price }}</td>
+                <td>
+                    <v-btn icon="fas fa-edit" density="compact" v-on:click="unsubscribe(currentPackage.packageId)"></v-btn>
+                </td>
+            </table>
+            <p class="text-info" v-else>
+                No packages for this user.
+            </p>
+        </div>
+    </div>
+    <div class="text-info" v-else>
+        <div v-if="isLoading">
+            Loading data from the server...
+        </div>
+        <div v-else>
+            No data has been retrieved.
+        </div>
     </div>
 </div>
+
+@section Scripts
+{
+    @await Html.PartialAsync("_VueJs")
+    @await Html.PartialAsync("_Vuetify")
+
+    <script>
+      const { createApp, ref } = Vue
+      const { createVuetify } = Vuetify
+      const vuetify = createVuetify();
+      const query = ref('');
+      let isLoading = ref(false);
+      let searchResults = ref([]);
+      const app = createApp({
+          setup() {
+              return {
+                  query,
+                  callSearchAPI,
+                  unsubscribe,
+                  searchResults,
+                  isLoading
+              }
+          },
+          mounted() {
+              console.log('mounted and loading default search data...');
+              callSearchAPI();
+          }
+      });
+      app.use(vuetify).mount('#app');
+      function unsubscribe(packageId) {
+          console.log('Unsubscribing for the current user the package with id ' + packageId);
+          isLoading.value = true;
+          let unsubscribeUrl = '@Url.Page("Dashboard", "Unsubscribe")';
+          let currentPackage = {
+              PackageId: packageId              
+          };
+
+          fetch(unsubscribeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    packageId: currentPackage
+                })
+            }).then(response => {
+              if (!response.ok) {
+                  console.log("There has been an error while fetching data from the server.");
+                  return Promise.reject(response);
+              }             
+          });
+          isLoading.value = false;
+          callSearchAPI();
+      }
+      
+      function callSearchAPI() {
+         let searchTerm = query.value;
+          console.log('searching with ' + searchTerm);        
+          isLoading.value = true;          
+          let searchUrl = '@Url.Page("Dashboard", "Search")' + "&query=" + searchTerm;
+          console.log("Search url is " + searchUrl);
+          fetch(searchUrl)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+              searchResults.value = data;
+            });
+          isLoading.value = false;        
+      }
+    </script>
+}
+
+@section Head
+{
+    @await Html.PartialAsync("_VuetifyStyles")
+}
