@@ -8,6 +8,7 @@
 <h3 class="text-muted">Dashboard</h3>
 
 <div id="app">
+    <p class="text-muted font-weight-medium p-4" v-if="message">{{ message }}</p>
     <div class="form-floating mb-3">
         <v-text-field clearable label="Enter search term to search users"
                       v-model="query"
@@ -58,12 +59,14 @@
       const { createVuetify } = Vuetify
       const vuetify = createVuetify();
       const query = ref('');
+      const message = ref('');
       let isLoading = ref(false);
       let searchResults = ref([]);
       const app = createApp({
           setup() {
               return {
                   query,
+                  message,
                   callSearchAPI,
                   unsubscribe,
                   searchResults,
@@ -79,6 +82,7 @@
       function unsubscribe(packageId) {
           console.log('Unsubscribing for the current user the package with id ' + packageId);
           isLoading.value = true;
+          message.value = "Unsubscribing...";
           let unsubscribeUrl = '@Url.Page("Dashboard", "Unsubscribe")';
           let currentPackage = {
               PackageId: packageId              
@@ -96,7 +100,8 @@
               if (!response.ok) {
                   console.log("There has been an error while fetching data from the server.");
                   return Promise.reject(response);
-              }             
+              }
+              message.value = "Unsubscribed successfully.";
           });
           isLoading.value = false;
           callSearchAPI();
@@ -105,7 +110,8 @@
       function callSearchAPI() {
          let searchTerm = query.value;
           console.log('searching with ' + searchTerm);        
-          isLoading.value = true;          
+          isLoading.value = true;    
+          message.value = "Retrieving data from the server...";      
           let searchUrl = '@Url.Page("Dashboard", "Search")' + "&query=" + searchTerm;
           console.log("Search url is " + searchUrl);
           fetch(searchUrl)
@@ -114,7 +120,8 @@
               console.log(data);
               searchResults.value = data;
             });
-          isLoading.value = false;        
+          isLoading.value = false;      
+          message.value = "";  
       }
     </script>
 }
