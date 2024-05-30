@@ -94,4 +94,14 @@ public class WebAppUserRepository(IOptions<SqlOptions> sqlOptionsValue)
         webAppUser.WebAppUserId = webAppUserId;
         return webAppUser;
     }
+
+    public async Task<WebAppUser> GetUserByEmailAsync(string email)
+    {
+        await using var connection = new SqlConnection(sqlOptions.ConnectionString);
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        var currentUser = await connection.QuerySingleOrDefaultAsync<WebAppUser>(
+            "SELECT U.McUserId as WebAppUserId, U.FullName,U.Email, U.Password FROM McUsers U WHERE U.Email=@requestPublisherId", new { requestPublisherId = email });
+        return currentUser;
+    }
 }
