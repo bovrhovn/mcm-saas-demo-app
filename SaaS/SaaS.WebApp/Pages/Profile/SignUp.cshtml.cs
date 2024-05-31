@@ -76,9 +76,11 @@ public class SignUpPageModel(
             var planId = string.Empty;
             if (hostEnvironment.IsDevelopment())
             {
-                var subscriptionViewModel = TempData["SubscriptionDev"] as SubscriptionViewModel;
-                planId = subscriptionViewModel?.planId;
-                logger.LogInformation("Subscription plan id {PlanId}", planId);
+                if (TempData["SubscriptionDev"] is SubscriptionViewModel subscriptionViewModel)
+                {
+                    planId = subscriptionViewModel?.planId;
+                    logger.LogInformation("Subscription plan id {PlanId}", planId);
+                }
             }
             else
             {
@@ -95,12 +97,15 @@ public class SignUpPageModel(
                         });
                 }
             }
-            
-            var package = await packageRepository.GetPackageBasedOnCodeAsync(planId);
-            var selectedPlanId = package.PackageId;
-            await packageRepository.SubscribeToPackageAsync(selectedPlanId, user.WebAppUserId);
-            logger.LogInformation("User {UserId} subscribed to package {PackageId}", user.WebAppUserId,
-                selectedPlanId);
+
+            if (!string.IsNullOrEmpty(planId))
+            {
+                var package = await packageRepository.GetPackageBasedOnCodeAsync(planId);
+                var selectedPlanId = package.PackageId;
+                await packageRepository.SubscribeToPackageAsync(selectedPlanId, user.WebAppUserId);
+                logger.LogInformation("User {UserId} subscribed to package {PackageId}", user.WebAppUserId,
+                    selectedPlanId);
+            }
 
             await HttpContext.SignInAsync(user.GenerateClaims());
             return Redirect("/");

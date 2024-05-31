@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Marketplace.SaaS;
 using Newtonsoft.Json;
 using SaaS.WebApp.Core;
 using SaaS.WebApp.Data;
