@@ -20,36 +20,49 @@ public class SignUpPageModel(
     IWebHostEnvironment hostEnvironment,
     PackageRepository packageRepository) : PageModel
 {
-    public async Task OnGet()
+    public async Task<IActionResult> OnGet()
     {
         logger.LogInformation("Sign up page visited {DateLoaded}", DateTime.Now);
-        if (!string.IsNullOrEmpty(Token))
+        if (User.Identity is { IsAuthenticated: true })
         {
-            logger.LogInformation("Token provided for signup {Token}", Token);
-            if (hostEnvironment.IsDevelopment())
-            {
-                var decodeValue = Convert.FromBase64String(Token);
-                var token = Encoding.UTF8.GetString(decodeValue);
-                var subscriptionViewModel = JsonConvert.DeserializeObject<SubscriptionViewModel>(token);
-                TempData["SubscriptionDev"] = subscriptionViewModel;
-                SignupModel.Username = subscriptionViewModel.purchaser.emailId;
-                SignupModel.FullName = subscriptionViewModel.purchaser.emailId;
-            }
-            else
-            {
-                var resolvedSubscription =
-                    await marketplaceSaaSClient.Fulfillment.ResolveAsync(Token);
-                if (resolvedSubscription.HasValue)
-                {
-                    var subscription = resolvedSubscription.Value;
-                    //do the signup and align to the packages behind the scenes
-                    var purchaserEmail = subscription.Subscription.Purchaser.EmailId;
-                    SignupModel.FullName = purchaserEmail;
-                    SignupModel.Username = purchaserEmail;
-                    TempData["Subscription"] = subscription;
-                }
-            }
+            logger.LogInformation("User already authenticated {UserId}", User.Identity.Name);
+            return Page();
         }
+
+        if (string.IsNullOrEmpty(Token))
+        {
+            logger.LogInformation("Normal signup page loaded (without token)");
+            return Page();
+        }
+
+        logger.LogInformation("Token provided for signup {Token}", Token);
+        if (hostEnvironment.IsDevelopment())
+        {
+            var decodeValue = Convert.FromBase64String(Token);
+            var token = Encoding.UTF8.GetString(decodeValue);
+            var subscriptionViewModel = JsonConvert.DeserializeObject<SubscriptionViewModel>(token);
+            TempData["SubscriptionDev"] = token;
+            SignupModel = new SignUpViewModel
+            {
+                Username = subscriptionViewModel.purchaser.emailId,
+                FullName = subscriptionViewModel.purchaser.emailId
+            };
+        }
+        else
+        {
+            var resolvedSubscription =
+                await marketplaceSaaSClient.Fulfillment.ResolveAsync(Token);
+            if (!resolvedSubscription.HasValue) return Page();
+            
+            var subscription = resolvedSubscription.Value;
+            //do the signup and align to the packages behind the scenes
+            var purchaserEmail = subscription.Subscription.Purchaser.EmailId;
+            SignupModel.FullName = purchaserEmail;
+            SignupModel.Username = purchaserEmail;
+            var passedData = JsonConvert.SerializeObject(subscription);
+            TempData["Subscription"] = passedData;
+        }
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -76,15 +89,23 @@ public class SignUpPageModel(
             var planId = string.Empty;
             if (hostEnvironment.IsDevelopment())
             {
-                var subscriptionViewModel = TempData["SubscriptionDev"] as SubscriptionViewModel;
-                planId = subscriptionViewModel?.planId;
-                logger.LogInformation("Subscription plan id {PlanId}", planId);
+                if (TempData["SubscriptionDev"] != null)
+                {
+                    var subscriptionViewModel =
+                        JsonConvert.DeserializeObject<SubscriptionViewModel>(TempData["SubscriptionDev"].ToString() ??
+                                                                             string.Empty);
+                    planId = subscriptionViewModel?.planId;
+                    logger.LogInformation("Subscription plan id {PlanId}", planId);
+                }
             }
             else
             {
                 //set the subscription
-                if (TempData["Subscription"] is ResolvedSubscription subscription)
+                if (TempData["Subscription"] != null)
                 {
+                    var subscription =
+                        JsonConvert.DeserializeObject<ResolvedSubscription>(TempData["Subscription"].ToString() ??
+                                                                            string.Empty);
                     //get plan
                     planId = subscription.PlanId;
                     //activate the subscription
@@ -95,12 +116,15 @@ public class SignUpPageModel(
                         });
                 }
             }
-            
-            var package = await packageRepository.GetPackageBasedOnCodeAsync(planId);
-            var selectedPlanId = package.PackageId;
-            await packageRepository.SubscribeToPackageAsync(selectedPlanId, user.WebAppUserId);
-            logger.LogInformation("User {UserId} subscribed to package {PackageId}", user.WebAppUserId,
-                selectedPlanId);
+
+            if (!string.IsNullOrEmpty(planId))
+            {
+                var package = await packageRepository.GetPackageBasedOnCodeAsync(planId);
+                var selectedPlanId = package.PackageId;
+                await packageRepository.SubscribeToPackageAsync(selectedPlanId, user.WebAppUserId);
+                logger.LogInformation("User {UserId} subscribed to package {PackageId}", user.WebAppUserId,
+                    selectedPlanId);
+            }
 
             await HttpContext.SignInAsync(user.GenerateClaims());
             return Redirect("/");
