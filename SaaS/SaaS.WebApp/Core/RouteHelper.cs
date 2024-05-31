@@ -7,5 +7,5 @@ public static class RouteHelper
     public const string SubscribeRoute = "subscribe";
     public const string UnsubscribeRoute = "unsubscribe";
     public const string RouteWebhook = "marketplace-webhook";
-    public const string WebHookRoute = "post";
+    public const string WebHookRoute = "actions";
 }

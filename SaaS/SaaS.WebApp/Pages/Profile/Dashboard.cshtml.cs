@@ -7,8 +7,7 @@ namespace SaaS.WebApp.Pages.Profile;
 public class DashboardPageModel(
     ILogger<DashboardPageModel> logger,
     UserDataContext userDataContext,
-    WebAppUserRepository webAppUserRepository,
-    PackageRepository packageRepository) : PageModel
+    WebAppUserRepository webAppUserRepository) : PageModel
 {
     public IActionResult OnGet()
     {

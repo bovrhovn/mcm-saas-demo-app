@@ -15,20 +15,19 @@ using SaaS.WebApp.Options;
 namespace SaaS.WebApp.Controllers;
 
 /*
- * Webhook event	1. When received	2. If accepted	3. If rejected
- * ChangePlan	Respond with HTTP 200	PATCH with success (this event is optional and autoaccepted in 10 secs)	PATCH with failure OR respond with 4xx (within 10 seconds)
+ * Webhook event	1. When received	    2. If accepted	    3. If rejected
+ * ChangePlan	    Respond with HTTP 200	PATCH with success (this event is optional and autoaccepted in 10 secs)	PATCH with failure OR respond with 4xx (within 10 seconds)
  * ChangeQuantity	Respond with HTTP 200	PATCH with success (this event is optional and autoaccepted in 10 secs)	PATCH with failure OR respond with 4xx (within 10 seconds)
- * Renew	Respond with HTTP 200	Not applicable	Not applicable
- * Suspend	Respond with HTTP 200	Not applicable	Not applicable
- * Unsubscribe	Respond with HTTP 200	Not applicable	Not applicable
- * Reinstate	Respond with HTTP 200	Not applicable	Not applicable (call delete API to trigger deletion if reinstate can't be accepted)
+ * Renew	        Respond with HTTP 200	Not applicable	Not applicable
+ * Suspend	        Respond with HTTP 200	Not applicable	Not applicable
+ * Unsubscribe	    Respond with HTTP 200	Not applicable	Not applicable
+ * Reinstate	    Respond with HTTP 200	Not applicable	Not applicable (call delete API to trigger deletion if reinstate can't be accepted)
  *
  *
  */
 [ApiController, AllowAnonymous, Route(RouteHelper.RouteWebhook)]
 public class WebhookController(
     ILogger<WebhookController> logger,
-    MarketplaceSaaSClient marketplaceSaaSClient,
     PackageRepository packageRepository,
     WebAppUserRepository webAppUserRepository,
     IWebHostEnvironment webHostEnvironment,
